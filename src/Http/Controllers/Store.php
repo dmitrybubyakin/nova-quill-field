@@ -4,7 +4,6 @@ namespace DmitryBubyakin\NovaQuillField\Http\Controllers;
 
 use Exception;
 use Validator;
-use Laravel\Nova\Nova;
 use DmitryBubyakin\NovaQuillField\Quill;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -27,9 +26,9 @@ class Store
 
     public function getField(NovaRequest $request): Quill
     {
-        $fields = Nova::resourceInstanceForKey($request->resourceName)->availableFields($request);
-
-        return $fields->whereInstanceOf(Quill::class)->first(function ($field) use ($request) {
+        return $request->newResourceWith(
+            $request->findModelQuery()->first() ?: $request->model()
+        )->availableFields($request)->first(function ($field) use ($request) {
             return $request->attribute === $field->attribute;
         }, function () {
             abort(404);

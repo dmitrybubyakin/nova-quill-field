@@ -55,7 +55,8 @@ export default {
                             const data = objectToFormData({
                                 file: file,
                                 attribute: vm.field.attribute,
-                                resourceName: vm.resourceName,
+                                resource: vm.resourceName,
+                                resourceId: vm.resourceId,
                                 ...vm.field.imageUploadParameters,
                             })
 
