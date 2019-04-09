@@ -21,7 +21,7 @@ class Store
         }
 
         return response()->json([
-            'dataUrl' => call_user_func($field->storeImagesUsing, $request->file, $request)
+            'dataUrl' => call_user_func($field->storeImagesUsing, $request->file, $request),
         ]);
     }
 

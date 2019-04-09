@@ -30,7 +30,7 @@ class Quill extends Field
         return [
             'file' => is_callable($this->imageRules)
                         ? call_user_func($this->imageRules, $request)
-                        : $this->imageRules
+                        : $this->imageRules,
         ];
     }
 
