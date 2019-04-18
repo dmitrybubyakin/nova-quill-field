@@ -1,14 +1,17 @@
 <template>
     <default-field :field="field" :errors="errors" :full-width-content="true">
         <template slot="field">
-            <quill-editor
-                class="border border-60 rounded-lg"
-                v-model="value"
-                :id="field.attribute"
-                :class="[...errorClasses, editorHeightClass]"
-                :options="options"
-                :placeholder="field.name"
-            />
+            <div :class="{ fullscreen }">
+                <quill-editor
+                    class="fullscreen-editor border border-60 rounded-lg"
+                    v-model="value"
+                    :id="field.attribute"
+                    :class="[...errorClasses, editorHeightClass]"
+                    :options="options"
+                    :placeholder="field.name"
+                    @ready="handleReady"
+                />
+            </div>
         </template>
     </default-field>
 </template>
@@ -20,8 +23,7 @@ import { quillEditor, Quill } from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 
-import ImageUploader from '../ImageUploader'
-Quill.register('modules/imageUploader', ImageUploader)
+Nova.$emit('nova-quill-field:loaded', Quill)
 
 export default {
     mixins: [FormField, HandlesValidationErrors],
@@ -32,6 +34,12 @@ export default {
         quillEditor,
     },
 
+    data () {
+        return {
+            fullscreen: false,
+        }
+    },
+
     computed: {
         options () {
             const vm = this
@@ -39,6 +47,11 @@ export default {
             return {
                 placeholder: this.field.placeholder || this.field.name,
                 modules: {
+                    fullscreen: {
+                        change (fullscreen) {
+                            vm.fullscreen = fullscreen
+                        }
+                    },
                     toolbar: {
                         container: this.field.toolbar || [
                             [{'header': 1}, {'header': 2}],
@@ -47,8 +60,18 @@ export default {
                             ['blockquote'],
                             [{'list': 'ordered'}, {'list': 'bullet'}],
                             ['clean'],
-                            ['link', 'image', 'video']
-                        ]
+                            ['link', 'image', 'video'],
+                            ['fullscreen', 'fullscreenExit'],
+                        ],
+                        handlers: {
+                            fullscreen () {
+                                this.quill.getModule('fullscreen').handleFullscreen()
+                            },
+
+                            fullscreenExit () {
+                                this.quill.getModule('fullscreen').handleFullscreenExit()
+                            }
+                        }
                     },
                     imageUploader: {
                         async upload (file) {
@@ -93,6 +116,10 @@ export default {
     },
 
     methods: {
+        handleReady (quill) {
+            Nova.$emit('nova-quill-field:ready', { field: this.field, quill })
+        },
+
         handleKeydown (event) {
             // fix https://github.com/laravel/nova-issues/issues/998
             if (event.keyCode == 191) {
@@ -118,6 +145,28 @@ export default {
 </script>
 
 <style lang="scss">
+.fullscreen {
+    background: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 100000;
+
+    .fullscreen-editor {
+        border-radius: 0;
+        border: none;
+    }
+
+    .ql-container {
+        height: calc(100vh - 3rem - 24px) !important; // 24px is the height of the tooltip button. 3rem is the padding
+        max-width: 1024px;
+        margin: 0 auto;
+        overflow-y: auto;
+    }
+}
+
 // height: ql-container-200 ... ql-container-700;
 @for $height from 2 through 7 {
     .ql-container-h-#{$height * 100} {

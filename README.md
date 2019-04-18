@@ -35,3 +35,39 @@ Quill::make('Body')
     ])
     ->placeholder('Write down something...'), // Customize placeholder
 ```
+
+## Event
+
+ - `nova-quill-field:loaded` &mdash; Called only once. You can register some global modules here.
+ - `nova-quill-field:ready` &mdash; Called every time the component is mounted. You can configure Quill instance here.
+
+```js
+import ImageUploader from './ImageUploader'
+
+// Override Image Uploader
+Nova.$once('nova-quill-field:loaded', Quill => {
+    Quill.register('modules/imageUploader', ImageUploader)
+})
+
+// Add icons
+Nova.$once('nova-quill-field:loaded', Quill => {
+    const icons = Quill.import('ui/icons')
+
+    icons['fullscreen'] = require('!html-loader!../icons/fullscreen.svg')
+    icons['fullscreenExit'] = require('!html-loader!../icons/fullscreen-exit.svg')
+})
+
+Nova.$on('nova-quill-field:ready', ({ field, quill }) => {
+    if (field.attribute !== 'needed-field') return
+
+    quill.keyboard.addBinding({
+        key: 'F',
+        shortKey: true,
+        shiftKey: true,
+        handler (range, context) {
+            // do something...
+        }
+    })
+})
+
+```
