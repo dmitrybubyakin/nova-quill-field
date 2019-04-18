@@ -5,7 +5,7 @@
                 class="border border-60 rounded-lg"
                 v-model="value"
                 :id="field.attribute"
-                :class="errorClasses"
+                :class="[...errorClasses, editorHeightClass]"
                 :options="options"
                 :placeholder="field.name"
             />
@@ -75,6 +75,12 @@ export default {
                     }
                 }
             }
+        },
+
+        editorHeightClass () {
+            const height = this.field.height || 400
+
+            return `ql-container-h-${height}`
         }
     },
 
@@ -112,8 +118,13 @@ export default {
 </script>
 
 <style lang="scss">
-.ql-container {
-    height: 500px;
+// height: ql-container-200 ... ql-container-700;
+@for $height from 2 through 7 {
+    .ql-container-h-#{$height * 100} {
+        .ql-container {
+            height: 100px * $height;
+        }
+    }
 }
 
 .ql-container,

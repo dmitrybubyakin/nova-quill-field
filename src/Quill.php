@@ -2,6 +2,7 @@
 
 namespace DmitryBubyakin\NovaQuillField;
 
+use InvalidArgumentException;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Fields\Expandable;
 use Illuminate\Contracts\Validation\Rule;
@@ -51,6 +52,17 @@ class Quill extends Field
     public function placeholder(string $placeholder): self
     {
         return $this->withMeta(['placeholder' => $placeholder]);
+    }
+
+    public function height(int $height): self
+    {
+        if (in_array($height, range(200, 700, 100))) {
+            return $this->withMeta(['height' => $height]);
+        }
+
+        throw new InvalidArgumentException(
+            'Available height values: '.implode(', ', range(200, 700, 100))
+        );
     }
 
     public function jsonSerialize()
