@@ -91,8 +91,6 @@ export default {
                                 const errors = new Errors(error.response.data.errors)
 
                                 Nova.$emit('error', errors.first('file'))
-
-                                throw error
                             }
                         }
                     }

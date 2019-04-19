@@ -18,7 +18,7 @@ export default class ImageUploader {
             files.map(file => this.options.upload(file))
         )
 
-        dataUrls.forEach(handler)
+        dataUrls.filter(Boolean).forEach(handler)
     }
 
     handle () {
