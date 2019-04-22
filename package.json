@@ -15,9 +15,10 @@
         "laravel-nova": "^1.0"
     },
     "dependencies": {
+        "lodash": "^4.17.11",
         "no-scroll": "^2.1.1",
         "object-to-formdata": "^1.6.4",
-        "vue": "^2.5.0",
-        "vue-quill-editor": "^3.0.6"
+        "quill": "^1.3.6",
+        "vue": "^2.5.0"
     }
 }

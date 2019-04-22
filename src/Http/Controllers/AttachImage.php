@@ -7,7 +7,7 @@ use Validator;
 use DmitryBubyakin\NovaQuillField\Quill;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Store
+class AttachImage extends Controller
 {
     public function __invoke(NovaRequest $request)
     {
@@ -22,16 +22,5 @@ class Store
         return response()->json([
             'dataUrl' => call_user_func($field->storeImagesUsing, $request->file, $request),
         ]);
-    }
-
-    public function getField(NovaRequest $request): Quill
-    {
-        return $request->newResourceWith(
-            $request->findModelQuery()->first() ?: $request->model()
-        )->availableFields($request)->first(function ($field) use ($request) {
-            return $request->attribute === $field->attribute;
-        }, function () {
-            abort(404);
-        });
     }
 }

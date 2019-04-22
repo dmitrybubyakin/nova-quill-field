@@ -2,14 +2,14 @@
     <default-field :field="field" :errors="errors" :full-width-content="true">
         <template slot="field">
             <div :class="{ fullscreen }">
-                <quill-editor
+                <Editor
                     class="fullscreen-editor border border-60 rounded-lg"
                     v-model="value"
                     :id="field.attribute"
                     :class="[...errorClasses, editorHeightClass]"
                     :options="options"
-                    :placeholder="field.name"
                     @ready="handleReady"
+                    @input="autosave"
                 />
             </div>
         </template>
@@ -17,11 +17,13 @@
 </template>
 
 <script>
+import debounce from 'lodash/debounce'
 import objectToFormData from 'object-to-formdata'
 import { FormField, HandlesValidationErrors, Errors } from 'laravel-nova'
-import { quillEditor, Quill } from 'vue-quill-editor'
+import Quill from 'quill'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
+import Editor from './Editor'
 
 Nova.$emit('nova-quill-field:loaded', Quill)
 
@@ -31,7 +33,7 @@ export default {
     props: ['resourceName', 'resourceId', 'field'],
 
     components: {
-        quillEditor,
+        Editor,
     },
 
     data () {
@@ -46,6 +48,7 @@ export default {
 
             return {
                 placeholder: this.field.placeholder || this.field.name,
+                theme: 'snow',
                 modules: {
                     fullscreen: {
                         change (fullscreen) {
@@ -84,7 +87,7 @@ export default {
                             })
 
                             try {
-                                const { data: { dataUrl }} = await Nova.request().post('/nova-vendor/nova-quill-field', data)
+                                const { data: { dataUrl }} = await Nova.request().post('/nova-vendor/nova-quill-field/attachment', data)
 
                                 return dataUrl
                             } catch (error) {
@@ -138,6 +141,17 @@ export default {
         handleChange (value) {
             this.value = value
         },
+
+        autosave: debounce(function () {
+            if (this.field.autosave) {
+                Nova.request().post('/nova-vendor/nova-quill-field/save', {
+                    value: this.value,
+                    attribute: this.field.attribute,
+                    resource: this.resourceName,
+                    resourceId: this.resourceId,
+                })
+            }
+        }, 1000)
     },
 }
 </script>

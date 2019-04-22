@@ -6,7 +6,7 @@ use Route;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Events\ServingNova;
 use Illuminate\Support\ServiceProvider;
-use DmitryBubyakin\NovaQuillField\Http\Controllers\Store;
+use DmitryBubyakin\NovaQuillField\Http\Controllers;
 
 class FieldServiceProvider extends ServiceProvider
 {
@@ -31,7 +31,8 @@ class FieldServiceProvider extends ServiceProvider
         Route::middleware(['nova'])
                 ->prefix('nova-vendor/nova-quill-field')
                 ->group(function () {
-                    Route::post('/', Store::class);
+                    Route::post('attachment', Controllers\AttachImage::class);
+                    Route::post('save', Controllers\Save::class);
                 });
     }
 }

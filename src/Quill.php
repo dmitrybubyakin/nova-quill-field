@@ -19,11 +19,20 @@ class Quill extends Field
 
     public $imageRules = [];
 
-    public function imageRules($rules)
+    public $autosaveCallback;
+
+    public function imageRules($rules): self
     {
         $this->imageRules = ($rules instanceof Rule || is_string($rules)) ? func_get_args() : $rules;
 
         return $this;
+    }
+
+    public function autosave(callable $autosaveCallback): self
+    {
+        $this->autosaveCallback = $autosaveCallback;
+
+        return $this->withMeta(['autosave' => true]);
     }
 
     public function getImageRules(): array
